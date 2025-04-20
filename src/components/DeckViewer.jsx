@@ -101,17 +101,6 @@ const DeckViewer = () => {
               </li>
             ))}
           </ul>
-
-          <div className="mt-10 text-center">
-            <h3 className="font-semibold mb-2">📱 Share with Students</h3>
-            <p className="text-sm text-gray-600 mb-2">Scan to open on mobile</p>
-            <div className="flex justify-center">
-              <QRCode
-                value={`${window.location.origin}/mobile?deck=${encodeURIComponent(`${selectedLevel} - ${selectedGrammar} - ${selectedTopic}`)}`}
-                size={128}
-              />
-            </div>
-          </div>
         </div>
       )}
     </div>
