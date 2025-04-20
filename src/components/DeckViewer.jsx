@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import a1ConversationData from "../data/a1_conversation_deck.json";
 import a2ConversationData from "../data/a2_conversation_deck.json";
-import QRCode from "react-qr-code";
 
 // Merge both A1 and A2 data into one object by level
 const conversationData = {
