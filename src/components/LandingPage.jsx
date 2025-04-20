@@ -1,14 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import conversationData from "../data/a1_conversation_deck.json";
 
-const decks = {
-  "C1 Mixed Conditionals": ["If you had studied more, would your grades be better?"],
-  "B2 Passive Voice": ["Is English used in your workplace?"],
+const getAllDecks = () => {
+  const decks = [];
+  Object.entries(conversationData).forEach(([level, grammars]) => {
+    Object.entries(grammars).forEach(([grammar, topics]) => {
+      Object.entries(topics).forEach(([topic, questions]) => {
+        decks.push({ level, grammar, topic, questions });
+      });
+    });
+  });
+  return decks;
 };
 
+const allDecks = getAllDecks();
+
 export default function Landing() {
-  const [selectedDeck, setSelectedDeck] = useState("C1 Mixed Conditionals");
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
+
+  const filteredDecks = allDecks.filter(deck =>
+    deck.topic.toLowerCase().includes(search.toLowerCase()) ||
+    deck.grammar.toLowerCase().includes(search.toLowerCase()) ||
+    deck.level.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 text-slate-800">
@@ -26,25 +42,36 @@ export default function Landing() {
       </section>
 
       <section id="deck-section" className="w-full px-6 py-16 bg-white text-center">
-        <h2 className="text-3xl font-bold mb-8">Start Your Session</h2>
-        <div className="max-w-xl mx-auto space-y-4">
-          <select
-            value={selectedDeck}
-            onChange={(e) => setSelectedDeck(e.target.value)}
-            className="w-full border border-slate-300 rounded-lg p-3 shadow-sm"
-          >
-            {Object.keys(decks).map((deck) => (
-              <option key={deck} value={deck}>{deck}</option>
-            ))}
-          </select>
+        <h2 className="text-3xl font-bold mb-8">Search Conversation Decks</h2>
 
-          <button
-            onClick={() => navigate(`/session?deck=${encodeURIComponent(selectedDeck)}`)}
-            className="w-full mt-4 inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 transition"
-          >
-            🚀 Start Session
-          </button>
+        <div className="max-w-xl mx-auto mb-10">
+          <input
+            type="text"
+            placeholder="Search topic, grammar, or level..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border border-slate-300 rounded-lg p-3 shadow-sm"
+          />
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDecks.map((deck, index) => (
+            <div
+              key={index}
+              className="bg-blue-100 p-4 rounded shadow hover:shadow-lg cursor-pointer"
+              onClick={() => navigate(`/session?deck=${encodeURIComponent(deck.topic)} - ${deck.grammar}`)}
+            >
+              <h3 className="text-lg font-bold mb-1">{deck.topic}</h3>
+              <p className="text-sm text-gray-700">Level: {deck.level}</p>
+              <p className="text-sm text-gray-700">Grammar: {deck.grammar}</p>
+              <p className="text-sm text-gray-600 mt-2">{deck.questions.length} Questions</p>
+            </div>
+          ))}
+        </div>
+
+        {filteredDecks.length === 0 && (
+          <p className="text-center text-gray-500 mt-6">No decks found. Try a different keyword.</p>
+        )}
       </section>
 
       <footer className="text-center py-6 text-slate-400 text-sm">

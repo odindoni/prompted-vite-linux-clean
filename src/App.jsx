@@ -1,8 +1,14 @@
+import { Routes, Route } from "react-router-dom";
+import Landing from "./components/LandingPage.jsx";
+import DeckViewer from "./components/DeckViewer";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <h1 className="text-3xl font-bold text-blue-800">Welcome to the Session Page</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/session" element={<DeckViewer />} />
+    </Routes>
   );
 }
+
 export default App;
