@@ -1,4 +1,5 @@
 import { useState } from "react";
+import conversationData from "./data/a1_conversation_deck.json";
 import { useNavigate } from "react-router-dom";
 
 const decks = {
