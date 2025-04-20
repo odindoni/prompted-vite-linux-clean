@@ -1,33 +1,49 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import conversationData from "../data/a1_conversation_deck.json";
+import a1ConversationData from "../data/a1_conversation_deck.json";
+import a2ConversationData from "../data/a2_conversation_deck.json";
 
 const getAllDecks = () => {
   const decks = [];
-  Object.entries(conversationData).forEach(([level, grammars]) => {
-    Object.entries(grammars).forEach(([grammar, topics]) => {
+
+  const allData = {
+    ...a1ConversationData,
+    ...a2ConversationData,
+  };
+
+  Object.entries(allData).forEach(([level, grammarObject]) => {
+    Object.entries(grammarObject).forEach(([grammar, topics]) => {
       Object.entries(topics).forEach(([topic, questions]) => {
         decks.push({ level, grammar, topic, questions });
       });
     });
   });
+
   return decks;
 };
-
 const allDecks = getAllDecks();
+
+const normalize = (str) =>
+  str
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export default function Landing() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const filteredDecks = allDecks.filter(deck =>
-    deck.topic.toLowerCase().includes(search.toLowerCase()) ||
-    deck.grammar.toLowerCase().includes(search.toLowerCase()) ||
-    deck.level.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredDecks = allDecks.filter((deck) => {
+    const searchTerms = normalize(search).split(" ").filter(Boolean);
+    const deckString = normalize(`${deck.level} ${deck.grammar} ${deck.topic}`);
+    return searchTerms.every((term) => deckString.includes(term));
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 text-slate-800">
+      {/* Hero Section */}
       <section className="w-full px-6 py-20 bg-blue-800 text-white text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-extrabold tracking-tight mb-4">Prompted</h1>
@@ -41,6 +57,7 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Deck Display Section */}
       <section id="deck-section" className="w-full px-6 py-16 bg-white text-center">
         <h2 className="text-3xl font-bold mb-8">Search Conversation Decks</h2>
 
@@ -59,7 +76,9 @@ export default function Landing() {
             <div
               key={index}
               className="bg-blue-100 p-4 rounded shadow hover:shadow-lg cursor-pointer"
-              onClick={() => navigate(`/session?deck=${encodeURIComponent(deck.topic)} - ${deck.grammar}`)}
+              onClick={() =>
+                navigate(`/session?deck=${encodeURIComponent(`${deck.level} - ${deck.grammar} - ${deck.topic}`)}`)
+              }
             >
               <h3 className="text-lg font-bold mb-1">{deck.topic}</h3>
               <p className="text-sm text-gray-700">Level: {deck.level}</p>
